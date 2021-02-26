@@ -19,9 +19,9 @@ text
 # Do not configure the X Window System
 skipx
 # System timezone, language and keyboard
-timezone --utc Europe/Copenhagen
-lang da_DK.UTF-8
-keyboard dk-latin1
+timezone --utc Europe/Berlin
+lang de_DE.UTF-8
+keyboard de-latin1
 # Network information
 # network  --bootproto=static --ip=192.168.122.110 --device=eth0 --onboot=on
 # If you want to configure a static IP:
@@ -62,7 +62,7 @@ net.bridge.bridge-nf-call-iptables=1" > /etc/sysctl.conf
 #---- Add user RKE -----
 groupadd docker
 adduser rke
-echo "rke:praqma" | chpasswd
+echo "rke:rancher" | chpasswd
 usermod -aG docker rke
 
 #---- Enable kernel modules -----
@@ -94,7 +94,7 @@ restorecon -R /home/rke/.ssh/authorized_keys
 
 
 ### Install Docker
-curl https://releases.rancher.com/install-docker/18.09.2.sh | sh
+curl https://releases.rancher.com/install-docker/19.03.sh | sh
 systemctl enable docker
 
 %end

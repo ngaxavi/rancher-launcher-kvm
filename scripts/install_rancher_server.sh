@@ -1,38 +1,36 @@
-echo "
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tiller
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: tiller
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
-subjects:
-  - kind: ServiceAccount
-    name: tiller
-    namespace: kube-system
 
-" > tiller-rbac-config.yaml
-kubectl create -f tiller-rbac-config.yaml
+source ../util.sh
 
-helm init --service-account tiller
+explain "Make sure that you are install kubectl, rke and helm"
+sleep 10s
 
-# Wait for tiller to be ready
-kubectl -n kube-system wait --for=condition=Ready -l app=helm,name=tiller pod --timeout=60s
+explain "Give the hostname for rancher (e.g. rancher.example.com):"
+read rancher_hostname
 
-helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+explain "Run RKE"
+tell rke up --config ../cluster.yml
 
-helm install stable/cert-manager \
-  --name cert-manager \
-  --namespace kube-system
+explain "Add the helm Chart Repository"
+tell helm --kubeconfig ../kube_config_cluster.yml repo add rancher-stable https://releases.rancher.com/server-charts/stable
 
-helm install rancher-latest/rancher \
-  --name rancher \
+explain "Create a namespace for Rancher"
+tell kubectl --kubeconfig ../kube_config_cluster.yml create namespace cattle-system
+
+explain "Installation cert-manager"
+tell kubectl --kubeconfig ../kube_config_cluster.yml apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v1.0.4/cert-manager.crds.yaml
+tell kubectl --kubeconfig ../kube_config_cluster.yml create namespace cert-manager
+tell helm --kubeconfig ../kube_config_cluster.yml repo add jetstack https://charts.jetstack.io
+tell helm --kubeconfig ../kube_config_cluster.yml repo update
+tell helm --kubeconfig ../kube_config_cluster.yml install cert-manager jetstack/cert-manager --namespace cert-manager --version v1.0.4
+tell kubectl --kubeconfig ../kube_config_cluster.yml -n cert-manager rollout status deploy/cert-manager
+
+explain "Install Rancher with Helm and Your Chosen Certificate Optionlink"
+tell helm --kubeconfig ../kube_config_cluster.yml install rancher rancher-stable/rancher \
   --namespace cattle-system \
-  --set hostname=rancher.praqma.com
+  --set hostname=$rancher_hostname
+
+explain "Verify that the Rancher Server is Succcessfully deployed"
+tell kubectl --kubeconfig ../kube_config_cluster.yml -n cattle-system rollout status deploy/rancher
+
+success "Navigate to the Rancher URL and enjoy :rocket:"
+
