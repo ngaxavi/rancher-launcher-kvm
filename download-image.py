@@ -38,7 +38,7 @@ def download_image(url: str, dst):
 
         last_percent_reported = percent
 
-    print("downloading " + url)
+    print("Downloading " + url)
 
     urlretrieve(url, dst, reporthook=reporthook)
     print()
@@ -48,6 +48,6 @@ if __name__ == '__main__':
     dst = 'centos7.iso'
     url = base_url + image_name
     if os.path.isfile(dst) and local_sha256(dst) == remote_sha256(url):
-        print('already downloaded.')
+        print('Already downloaded.')
     else:
         download_image(url, dst)

@@ -18,7 +18,7 @@ logging --level=info
 text
 # Do not configure the X Window System
 skipx
-# System timezone, language and keyboard
+# System timezone, language and keyboard (WARN: set your own configuration)
 timezone --utc Europe/Berlin
 lang de_DE.UTF-8
 keyboard de-latin1

@@ -33,6 +33,6 @@ cd scripts && chmod +x install_rancher_server.sh
 ./install_rancher_server.sh
 ```
 
-Go take a coffee 😊 it takes several minutes to set up the cluster and the Rancher UI.
+Go take a coffee ☕ 😊 it takes several minutes to set up the cluster and the Rancher UI.
 
 When it finished navigate to your specified rancher url and enjoy it 🚀 💯 .
